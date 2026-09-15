@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Élan — Assistant culturel</title>
+<style>
+:root {
+  --bg: #f6f4ef;
+  --card: #ffffff;
+  --ink: #171717;
+  --muted: #73716b;
+  --line: #e5e1d8;
+  --soft: #ece8df;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input { font: inherit; }
+
+.app {
+  max-width: 1180px;
+  margin: auto;
+  min-height: 100vh;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.logo { font-weight: 800; font-size: 22px; letter-spacing: -.04em; }
+.top small { color: var(--muted); font-weight: 600; }
+
+.progress {
+  height: 4px;
+  background: #ddd8ce;
+  border-radius: 9px;
+  overflow: hidden;
+  margin-bottom: 34px;
+}
+.bar {
+  height: 100%;
+  background: var(--ink);
+  width: 14.2%;
+  transition: width 0.3s ease;
+}
+
+main { max-width: 850px; margin: 0 auto; width: 100%; flex: 1; }
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: 11px;
+  font-weight: 750;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: clamp(34px, 5.5vw, 62px);
+  line-height: .98;
+  letter-spacing: -.055em;
+  margin: 0 0 16px;
+}
+
+.intro {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #5e5b55;
+  max-width: 650px;
+  margin-bottom: 34px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.choice {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 62px;
+  transition: all 0.15s ease;
+  user-select: none;
+  text-align: left;
+  cursor: pointer;
+}
+.choice:hover { transform: translateY(-1px); border-color: #aaa; }
+.choice.selected { background: var(--ink); color: white; border-color: var(--ink); }
+.choice.priority {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 2px #f59e0b;
+}
+.choice span:last-child { opacity: .65; font-size: 13px; font-weight: 600; }
+
+.text-input {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.text-input:focus { border-color: var(--ink); }
+
+.location-box {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.section { margin: 28px 0; }
+.section h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.rangebox {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 14px;
+}
+.rangehead { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 14px; }
+.range { width: 100%; accent-color: var(--ink); cursor: pointer; }
+
+.toggleline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 18px;
+  border-radius: 16px;
+  margin: 10px 0;
+}
+.switch {
+  width: 50px;
+  height: 28px;
+  border-radius: 99px;
+  background: #ccc;
+  padding: 3px;
+  cursor: pointer;
+}
+.switch i {
+  display: block;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  transition: transform .2s ease;
+}
+.switch.on { background: var(--ink); }
+.switch.on i { transform: translateX(22px); }
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 38px;
+  padding-bottom: 20px;
+}
+.btn {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-weight: 700;
+  transition: opacity .15s;
+}
+.btn.secondary { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+
+.note { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.score { font-weight: 800; font-size: 22px; letter-spacing: -.03em; }
+
+.results { display: grid; gap: 16px; }
+.event { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 24px; }
+.eventtop { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.tag {
+  display: inline-block;
+  background: var(--soft);
+  border-radius: 99px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 12px;
+}
+.tag.source-badge { background: #e0f2fe; color: #0369a1; margin-left: 6px; }
+
+.event h2 { font-size: 24px; letter-spacing: -.035em; margin: 0 0 8px; line-height: 1.15; }
+.meta { color: #65625b; font-size: 14px; line-height: 1.6; }
+.why {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: #f7f5f0;
+  border-radius: 14px;
+  color: #4d4a45;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.actions { display: flex; gap: 8px; margin-top: 18px; }
+.mini {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all .15s ease;
+  text-decoration: none;
+  color: var(--ink);
+  display: inline-block;
+  cursor: pointer;
+}
+.mini.liked { background: var(--ink); color: white; border-color: var(--ink); }
+
+.profile-card {
+  background: var(--ink);
+  color: white;
+  border-radius: 22px;
+  padding: 22px;
+  margin-bottom: 24px;
+}
+.profile-card strong { font-size: 20px; }
+.stats { display: flex; gap: 24px; margin-top: 14px; }
+.stats div { font-size: 13px; color: #bdbab2; }
+.stats b { display: block; color: white; font-size: 20px; font-weight: 800; }
+
+footer { padding: 30px 0 10px; text-align: center; color: #aaa; font-size: 12px; }
+
+@media(max-width:650px){
+  .app { padding: 16px; }
+  .grid { grid-template-columns: 1fr; }
+  .title { font-size: 40px; }
+  .top { margin-bottom: 20px; }
+  .choice { min-height: 56px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo">élan<span style="opacity:.35">.</span></div>
+    <small id="stepText">Profil culturel · 1/7</small>
+  </header>
+  
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  
+  <main id="app"></main>
+  
+  <footer>Prototype interactif · V1.1 avec agrégation multi-sources</footer>
+</div>
+
+<script>
+// ÉTAT GLOBAL
+const state = {
+  step: 1,
+  city: "Paris",
+  locationMode: "city",
+  address: "",
+  radiusKm: 5,
+  arts: [],
+  topics: {}, 
+  budget: 50,
+  maxPrice: 20,
+  count: 5, // valeur par défaut ajustée
+  adventure: true,
+  indie: true,
+  notify: true,
+  email: true,
+  liked: [],
+  liveEvents: [],
+  isLoadingEvents: false
+};
+
+const artsData = {
+  "Musique & Son": ["Classique", "Opéra", "Jazz", "Chanson", "Rock / Pop", "Électro", "Musiques du monde", "Musique contemporaine"],
+  "Spectacle vivant": ["Théâtre", "Danse", "Performance", "Cirque", "Humour"],
+  "Arts visuels": ["Expositions", "Art contemporain", "Peinture", "Photographie", "Sculpture", "Architecture"],
+  "Image & Écran": ["Cinéma", "Documentaire", "Cinéma d'auteur", "Rétrospectives", "Ciné-concert"],
+  "Idées & Mots": ["Littérature", "Philosophie", "Histoire", "Conférences", "Débats", "Rencontres"],
+  "Patrimoine": ["Patrimoine", "Visites guidées", "Archéologie", "Culture scientifique"]
+};
+
+const topicsData = {
+  "Société & Engagements": ["Politique", "Féminisme", "Écologie", "Géopolitique", "Luttes sociales", "Questions de société"],
+  "Art & Culture": ["Art contemporain", "Histoire de l'art", "Patrimoine", "Avant-garde", "Architecture", "Culture classique"],
+  "Histoire & Civilisations": ["Antiquité", "Moyen Âge", "Renaissance", "XIXe siècle", "XXe siècle", "Histoire contemporaine"],
+  "Sciences & Futurs": ["Sciences", "Technologie", "Intelligence artificielle", "Anthropologie", "Philosophie", "Religion"]
+};
+
+// NAVIGATION
+function next() { 
+  if (state.step < 7) {
+    state.step++;
+    if (state.step === 6) {
+      fetchRecommendations();
+    }
+    render(); 
+  }
+}
+function prev() { if (state.step > 1) { state.step--; render(); } }
+function setVal(key, val) { state[key] = val; render(); }
+
+function toggleTopic(topic) {
+  const current = state.topics[topic] || 0;
+  const countStars = Object.values(state.topics).filter(v => v === 2).length;
+
+  if (current === 0) {
+    state.topics[topic] = 1;
+  } else if (current === 1) {
+    if (countStars >= 5) {
+      alert("Maximum 5 thématiques prioritaires (⭐) !");
+      delete state.topics[topic];
+    } else {
+      state.topics[topic] = 2;
+    }
+  } else {
+    delete state.topics[topic];
+  }
+  render();
+}
+
+function toggleArt(art) {
+  if (state.arts.includes(art)) {
+    state.arts = state.arts.filter(x => x !== art);
+  } else {
+    state.arts.push(art);
+  }
+  render();
+}
+
+function like(id) {
+  if (state.liked.includes(id)) {
+    state.liked = state.liked.filter(x => x !== id);
+  } else {
+    state.liked.push(id);
+  }
+  render();
+}
+
+// RÉCUPÉRATION DES RECOMMANDATIONS (Hybride : Netlify local ou Mock GitHub)
+async function fetchRecommendations() {
+  state.isLoadingEvents = true;
+  render();
+  
+  // Si on est sur GitHub Pages (ou un autre hébergeur statique sans Netlify functions)
+  if (window.location.hostname.includes('github.io')) {
+    await new Promise(resolve => setTimeout(resolve, 500)); // Petit délai réaliste
+    
+    const mockEvents = [
+      { id: 1, titre: "Exposition Art & Numérique", medium: "Arts visuels", lieu: "Centre d'Art", jour: "Ce jeudi à 19h", prix: 14, eventUrl: "#", source: "OpenAgenda" },
+      { id: 2, titre: "Concert de Jazz Contemporain", medium: "Musique & Son", lieu: "Le Petit Club", jour: "Vendredi prochain", prix: 18, eventUrl: "#", source: "Ticketmaster" },
+      { id: 3, titre: "Conférence : Les Futurs de l'IA", medium: "Idées & Mots", lieu: "Médiathèque centrale", jour: "Samedi à 15h", prix: 0, eventUrl: "#", source: "Mairie" },
+      { id: 4, titre: "Pièce de théâtre immersive", medium: "Spectacle vivant", lieu: "Théâtre de la Ville", jour: "Dimanche à 17h", prix: 22, eventUrl: "#", source: "OpenAgenda" },
+      { id: 5, titre: "Rétrospective Cinéma d'auteur", medium: "Image & Écran", lieu: "Cinéma indépendant", jour: "Lundi prochain", prix: 9, eventUrl: "#", source: "Allociné" }
+    ];
+
+    state.liveEvents = mockEvents.map((ev, index) => ({
+      ...ev,
+      lieu: `${ev.lieu} (${state.city})`,
+      score: 85 - (index * 4),
+      matchReasons: [`📍 ${ev.source}`, `💶 ${ev.prix === 0 ? 'Gratuit' : ev.prix + '€'}`]
+    }));
+
+    state.isLoadingEvents = false;
+    render();
+    return;
+  }
+
+  // Comportement normal (quand vous testez en local avec Netlify Dev)
+  try {
+    const res = await fetch(`/.netlify/functions/events?city=${encodeURIComponent(state.city)}`);
+    if (!res.ok) throw new Error("Erreur réseau");
+    const data = await res.json();
+    
+    state.liveEvents = data.map((ev, index) => {
+      let score = 70 + (index % 25);
+      let matchReasons = [`📍 ${ev.source || 'Aggregator'}`];
+      
+      if (ev.prix <= state.maxPrice) {
+        matchReasons.push(`💶 ${ev.prix === 0 ? 'Gratuit' : ev.prix + '€'}`);
+      }
+
+      return {
+        id: ev.id || index,
+        titre: ev.titre,
+        medium: ev.medium || "Expositions",
+        lieu: ev.lieu || state.city,
+        jour: ev.jour || "Prochainement",
+        prix: ev.prix !== undefined ? ev.prix : 10,
+        eventUrl: ev.eventUrl || "#",
+        source: ev.source || "Mairie de Paris",
+        score: Math.min(score, 98),
+        matchReasons
+      };
+    });
+  } catch (err) {
+    console.error("Erreur fetch events:", err);
+    state.liveEvents = [];
+  } finally {
+    state.isLoadingEvents = false;
+    render();
+  }
+}
+
+// RENDU DE L'APPLICATION
+function render() {
+  const s = state.step;
+  document.getElementById("stepText").textContent = s === 6 ? "Ton programme · 6/7" : `Profil culturel · ${s}/7`;
+  document.getElementById("bar").style.width = ((s / 7) * 100) + "%";
+
+  let h = "";
+
+  if (s === 1) {
+    h = `
+      <div class="eyebrow">01 · Périmètre</div>
+      <h1 class="title">Où veux-tu<br>sortir ?</h1>
+      <p class="intro">Définis ton secteur de référence pour ne voir que les sorties accessibles.</p>
+      
+      <div class="section">
+        <h3>Ville principale</h3>
+        <div class="grid">
+          ${["Paris", "Lyon", "Marseille", "Bordeaux", "Lille", "Nantes", "Toulouse"].map(x => `
+            <button class="choice ${state.city === x ? 'selected' : ''}" onclick="setVal('city','${x}')">
+              <span>${x}</span><span>${state.city === x ? '✓' : '+'}</span>
+            </button>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Mode de déplacement</h3>
+        <div class="grid">
+          <button class="choice ${state.locationMode === 'city' ? 'selected' : ''}" onclick="setVal('locationMode','city')">
+            <span>🌆 Toute la ville</span><span>${state.locationMode === 'city' ? '✓' : '+'}</span>
+          </button>
+          <button class="choice ${state.locationMode === 'address' ? 'selected' : ''}" onclick="setVal('locationMode','address')">
+            <span>📍 Autour d'une adresse</span><span>${state.locationMode === 'address' ? '✓' : '+'}</span>
+          </button>
+        </div>
+      </div>
+
+      ${state.locationMode === 'address' ? `
+        <div class="location-box">
+          <label style="display:block; font-weight:700; margin-bottom:8px; font-size:14px">Adresse de départ</label>
+          <input type="text" class="text-input" placeholder="ex: 12 rue de la République" value="${state.address}" oninput="state.address = this.value">
+          <div style="margin-top:20px">
+            <div class="rangehead"><span>Rayon maximal</span><strong>${state.radiusKm} km</strong></div>
+            <input class="range" type="range" min="1" max="25" step="1" value="${state.radiusKm}" oninput="state.radiusKm=+this.value; this.previousElementSibling.querySelector('strong').textContent=this.value+' km'">
+          </div>
+        </div>
+      ` : ''}
+    `;
+  }
+
+  if (s === 2) {
+    h = `
+      <div class="eyebrow">02 · Arts</div>
+      <h1 class="title">Qu'est-ce qui<br>t'attire ?</h1>
+      <p class="intro">Coche les formes d'expression qui te plaisent.</p>
+      ${Object.entries(artsData).map(([cat, list]) => `
+        <div class="section">
+          <h3>${cat}</h3>
+          <div class="grid">
+            ${list.map(x => `
+              <button class="choice ${state.arts.includes(x) ? 'selected' : ''}" onclick="toggleArt('${x.replace("'", "\\'")}')">
+                <span>${x}</span><span>${state.arts.includes(x) ? '✓' : '+'}</span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `).join("")}
+    `;
+  }
+
+  if (s === 3) {
+    const starCount = Object.values(state.topics).filter(v => v === 2).length;
+    h = `
+      <div class="eyebrow">03 · Thématiques</div>
+      <h1 class="title">Et surtout,<br>quels sujets ?</h1>
+      <p class="intro">1 clic = Intéressé (🔵) &nbsp;·&nbsp; 2 clics = Prioritaire ⭐ (${starCount}/5 max)</p>
+      ${Object.entries(topicsData).map(([cat, list]) => `
+        <div class="section">
+          <h3>${cat}</h3>
+          <div class="grid">
+            ${list.map(x => {
+              const status = state.topics[x] || 0;
+              let cls = "";
+              let icon = "+";
+              if (status === 1) { cls = "selected"; icon = "🔵"; }
+              if (status === 2) { cls = "priority"; icon = "⭐"; }
+              return `
+                <button class="choice ${cls}" onclick="toggleTopic('${x.replace("'", "\\'")}')">
+                  <span>${x}</span><span>${icon}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `).join("")}
+    `;
+  }
+
+  if (s === 4) {
+    h = `
+      <div class="eyebrow">04 · Budget</div>
+      <h1 class="title">Combien veux-tu<br>dépenser ?</h1>
+      <p class="intro">Je respecterai tes limites financières.</p>
+      <div class="rangebox">
+        <div class="rangehead"><span>Budget hebdomadaire estimé</span><strong>${state.budget} €</strong></div>
+        <input class="range" type="range" min="0" max="150" step="5" value="${state.budget}" oninput="state.budget=+this.value;this.previousElementSibling.querySelector('strong').textContent=this.value+' €'">
+      </div>
+      <div class="rangebox">
+        <div class="rangehead"><span>Prix maximum d'une sortie</span><strong>${state.maxPrice} €</strong></div>
+        <input class="range" type="range" min="0" max="80" step="1" value="${state.maxPrice}" oninput="state.maxPrice=+this.value;this.previousElementSibling.querySelector('strong').textContent=this.value+' €'">
+      </div>
+      <div class="rangebox">
+        <div class="rangehead"><span>Nombre de propositions par semaine</span><strong>${state.count}</strong></div>
+        <input class="range" type="range" min="1" max="20" step="1" value="${state.count}" oninput="state.count=+this.value;this.previousElementSibling.querySelector('strong').textContent=this.value">
+      </div>
+    `;
+  }
+
+  if (s === 5) {
+    h = `
+      <div class="eyebrow">05 · Découverte</div>
+      <h1 class="title">Laisse-moi<br>un peu de liberté.</h1>
+      <p class="intro">L'assistant peut prendre des initiatives pertinentes.</p>
+      <div class="toggleline">
+        <div>
+          <b>Mode Sérendipité</b>
+          <div class="note">Me proposer des formes d'art variées.</div>
+        </div>
+        <div class="switch ${state.adventure ? 'on' : ''}" onclick="state.adventure=!state.adventure;render()"><i></i></div>
+      </div>
+      <div class="toggleline">
+        <div>
+          <b>Petits lieux & indépendants</b>
+          <div class="note">Mettre en avant les galeries alternatives.</div>
+        </div>
+        <div class="switch ${state.indie ? 'on' : ''}" onclick="state.indie=!state.indie;render()"><i></i></div>
+      </div>
+    `;
+  }
+
+  if (s === 6) {
+    const starTopics = Object.entries(state.topics).filter(([k, v]) => v === 2).map(([k]) => k);
+    const recs = state.liveEvents
+      .filter(e => e.prix <= state.maxPrice)
+      .slice(0, state.count);
+
+    h = `
+      <div class="eyebrow">06 · Sélection</div>
+      <h1 class="title" style="font-size:clamp(32px, 5vw, 48px)">Ton programme.</h1>
+      <p class="intro" style="margin-bottom:20px">Voici les propositions actuelles récupérées pour toi à ${state.city}.</p>
+      
+      <div class="profile-card">
+        <strong>Ton profil calibré</strong>
+        <div class="stats">
+          <div><b>${state.locationMode === 'address' ? state.radiusKm + ' km' : 'Toute la ville'}</b> périmètre</div>
+          <div><b>${starTopics.length || "0"}</b> priorités ⭐</div>
+          <div><b>${state.maxPrice}€</b> max / sortie</div>
+        </div>
+      </div>
+
+      <div class="results">
+        ${state.isLoadingEvents ? `<p class="note" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid var(--line);">Interrogation en cours des sources (Paris, OpenAgenda, Ticketmaster)...</p>` : ''}
+        
+        ${!state.isLoadingEvents && recs.length === 0 ? `<p class="note" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid var(--line);">Aucun événement ne correspond ton prix max (${state.maxPrice} €). Essaie d'augmenter le budget à l'étape 4 !</p>` : ''}
+        
+        ${recs.map((e, i) => `
+          <article class="event">
+            <div class="eventtop">
+              <div>
+                <span class="tag">${e.medium}</span>
+                <span class="tag source-badge">${e.source}</span>
+                <h2>${i + 1}. ${e.titre}</h2>
+                <div class="meta">📅 ${e.jour} · 📍 ${e.lieu} · 💶 ${e.prix === 0 ? 'Gratuit' : e.prix + ' €'}</div>
+              </div>
+              <div class="score">${e.score}%</div>
+            </div>
+            <div class="why">
+              <b>Détails de l'offre :</b><br>
+              ${e.matchReasons.join(' · ')}
+            </div>
+            <div class="actions">
+              <button class="mini ${state.liked.includes(e.id) ? 'liked' : ''}" onclick="like('${e.id}')">
+                ${state.liked.includes(e.id) ? '❤️ Enregistré' : '❤️ J\'aime'}
+              </button>
+              <a class="mini" href="${e.eventUrl}" target="_blank" rel="noopener noreferrer">Réserver →</a>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  if (s === 7) {
+    h = `
+      <div class="eyebrow">07 · Rendez-vous</div>
+      <h1 class="title">Je m'occupe<br>de la veille.</h1>
+      <p class="intro">Chaque semaine, je récapitule les meilleures options.</p>
+      <div class="toggleline">
+        <div>
+          <b>Programme hebdomadaire</b>
+          <div class="note">Recevoir une alerte chaque dimanche à 18h00.</div>
+        </div>
+        <div class="switch ${state.notify ? 'on' : ''}" onclick="state.notify=!state.notify;render()"><i></i></div>
+      </div>
+      <div class="toggleline">
+        <div>
+          <b>Récapitulatif par Email</b>
+          <div class="note">Recevoir la sélection directement dans ma boîte mail.</div>
+        </div>
+        <div class="switch ${state.email ? 'on' : ''}" onclick="state.email=!state.email;render()"><i></i></div>
+      </div>
+      <div class="profile-card" style="margin-top:24px">
+        <strong>✨ Profil configuré avec succès !</strong>
+        <p style="color:#bdbab2; font-size:14px; margin-top:8px; line-height:1.5">Ton périmètre est enregistré.</p>
+      </div>
+    `;
+  }
+
+  document.getElementById("app").innerHTML = h + `
+    <div class="nav">
+      <button class="btn secondary" onclick="prev()" ${s === 1 ? 'disabled' : ''}>← Retour</button>
+      ${s < 7 ? `<button class="btn" onclick="next()">Continuer →</button>` : `<button class="btn" onclick="state.step=6;fetchRecommendations();render()">Voir mon programme →</button>`}
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
