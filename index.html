@@ -383,11 +383,12 @@ async function fetchRecommendations() {
   if (window.location.hostname.includes('github.io')) {
     await new Promise(resolve => setTimeout(resolve, 500)); // Petit délai réaliste
     
+    // Tableau de test avec des liens dynamiques et différents pour chaque événement
     const mockEvents = [
-      { id: 1, titre: "Exposition Art & Numérique", medium: "Arts visuels", lieu: "Centre d'Art", jour: "Ce jeudi à 19h", prix: 14, eventUrl: "https://www.centrepompidou.fr", source: "OpenAgenda" },
+      { id: 1, titre: "Exposition Art & Numérique", medium: "Arts visuels", lieu: "Centre d'Art", jour: "Ce jeudi à 19h", prix: 14, eventUrl: "https://www.centrepompidou.fr/fr/programme/agenda", source: "OpenAgenda" },
       { id: 2, titre: "Concert de Jazz Contemporain", medium: "Musique & Son", lieu: "Le Petit Club", jour: "Vendredi prochain", prix: 18, eventUrl: "https://www.ticketmaster.fr", source: "Ticketmaster" },
-      { id: 3, titre: "Conférence : Les Futurs de l'IA", medium: "Idées & Mots", lieu: "Médiathèque centrale", jour: "Samedi à 15h", prix: 0, eventUrl: "https://www.paris.fr", source: "Mairie" },
-      { id: 4, titre: "Pièce de théâtre immersive", medium: "Spectacle vivant", lieu: "Théâtre de la Ville", jour: "Dimanche à 17h", prix: 22, eventUrl: "https://www.theatredelaville-paris.com", source: "OpenAgenda" },
+      { id: 3, titre: "Conférence : Les Futurs de l'IA", medium: "Idées & Mots", lieu: "Médiathèque centrale", jour: "Samedi à 15h", prix: 0, eventUrl: "https://www.paris.fr/evenements", source: "Mairie" },
+      { id: 4, titre: "Pièce de théâtre immersive", medium: "Spectacle vivant", lieu: "Théâtre de la Ville", jour: "Dimanche à 17h", prix: 22, eventUrl: "https://www.theatredelaville-paris.com/fr/spectacles", source: "OpenAgenda" },
       { id: 5, titre: "Rétrospective Cinéma d'auteur", medium: "Image & Écran", lieu: "Cinéma indépendant", jour: "Lundi prochain", prix: 9, eventUrl: "https://www.allocine.fr", source: "Allociné" }
     ];
 
@@ -424,7 +425,7 @@ async function fetchRecommendations() {
         lieu: ev.lieu || state.city,
         jour: ev.jour || "Prochainement",
         prix: ev.prix !== undefined ? ev.prix : 10,
-        eventUrl: ev.eventUrl || "#",
+        eventUrl: ev.eventUrl || "https://www.google.com/search?q=" + encodeURIComponent(ev.titre),
         source: ev.source || "Mairie de Paris",
         score: Math.min(score, 98),
         matchReasons
