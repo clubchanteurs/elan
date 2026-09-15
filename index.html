@@ -582,9 +582,16 @@ function render() {
 
   if (s === 6) {
     const starTopics = Object.entries(state.topics).filter(([k, v]) => v === 2).map(([k]) => k);
-    const recs = state.liveEvents
-      .filter(e => e.prix <= state.maxPrice)
-      .slice(0, state.count);
+    // Filtrage dynamique selon le prix max ET les arts sélectionnés à l'étape 2
+    const recs = state.liveEvents.filter(e => {
+      // 1. Filtre prix
+      const matchPrice = e.prix <= state.maxPrice;
+      
+      // 2. Filtre arts (si l'utilisateur a coché des arts à l'étape 2, on filtre par rapport à ceux-ci)
+      const matchArts = state.arts.length === 0 || state.arts.includes(e.medium);
+
+      return matchPrice && matchArts;
+    }).slice(0, state.count);
 
     h = `
       <div class="eyebrow">06 · Sélection</div>
